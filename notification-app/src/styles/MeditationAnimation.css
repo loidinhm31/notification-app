@@ -1,0 +1,62 @@
+.meditation-container {
+  position: relative;
+  width: 120px;
+  height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.meditation-container svg {
+  filter: drop-shadow(0 4px 8px rgba(147, 112, 219, 0.3));
+}
+
+.person {
+  transform-origin: center;
+}
+
+.breath-guide {
+  position: relative;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.breath-guide span {
+  position: absolute;
+  white-space: nowrap;
+}
+
+/* Add subtle glow animation to the container */
+@keyframes gentle-glow {
+  0%, 100% {
+    filter: drop-shadow(0 4px 8px rgba(147, 112, 219, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 4px 12px rgba(147, 112, 219, 0.5));
+  }
+}
+
+.meditation-container svg {
+  animation: gentle-glow 4s ease-in-out infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .meditation-container {
+    width: 100px;
+    height: 150px;
+  }
+
+  .breath-guide {
+    font-size: 10px;
+  }
+}
