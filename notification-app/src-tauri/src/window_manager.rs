@@ -1,8 +1,8 @@
-use tauri::Window;
+use tauri::WebviewWindow;
 use std::collections::HashMap;
 
 pub struct WindowManager {
-    windows: HashMap<String, Window>,
+    windows: HashMap<String, WebviewWindow>,
 }
 
 impl WindowManager {
@@ -12,11 +12,11 @@ impl WindowManager {
         }
     }
 
-    pub fn register_window(&mut self, id: String, window: Window) {
+    pub fn register_window(&mut self, id: String, window: WebviewWindow) {
         self.windows.insert(id, window);
     }
 
-    pub fn get_window(&self, id: &str) -> Option<&Window> {
+    pub fn get_window(&self, id: &str) -> Option<&WebviewWindow> {
         self.windows.get(id)
     }
 

@@ -1,59 +1,45 @@
 {
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Notification App",
+  "version": "0.1.0",
+  "identifier": "com.notificationapp.dev",
   "build": {
     "beforeDevCommand": "pnpm run dev",
+    "devUrl": "http://localhost:5173",
     "beforeBuildCommand": "pnpm run build",
-    "devPath": "http://localhost:5173",
-    "distDir": "../dist",
-    "withGlobalTauri": false
+    "frontendDist": "../dist"
   },
-  "package": {
-    "productName": "Notification App",
-    "version": "0.1.0"
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": ["icons/icon.png"]
   },
-  "tauri": {
-    "allowlist": {
-      "all": false,
-      "shell": {
-        "all": false,
-        "open": true
-      },
-      "window": {
-        "all": true,
-        "create": true,
-        "center": true,
-        "setPosition": true,
-        "show": true,
-        "hide": true,
-        "close": true
-      },
-      "notification": {
-        "all": true
-      }
-    },
-    "bundle": {
-      "active": true,
-      "targets": "all",
-      "identifier": "com.notificationapp.dev",
-      "icon": ["icons/icon.png"]
-    },
-    "security": {
-      "csp": null
-    },
-    "systemTray": {
-      "iconPath": "icons/icon.png",
-      "iconAsTemplate": true,
-      "menuOnLeftClick": false
-    },
+  "app": {
     "windows": [
       {
-        "fullscreen": false,
-        "resizable": false,
+        "label": "main",
         "title": "Notification App",
         "width": 0,
         "height": 0,
         "visible": false,
+        "resizable": false,
+        "fullscreen": false,
         "decorations": false
       }
-    ]
+    ],
+    "security": {
+      "csp": null,
+      "capabilities": ["default"]
+    },
+    "trayIcon": {
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": true,
+      "menuOnLeftClick": false
+    }
+  },
+  "plugins": {
+    "shell": {
+      "open": true
+    }
   }
 }

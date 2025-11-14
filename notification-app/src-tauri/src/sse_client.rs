@@ -2,7 +2,7 @@ use futures::stream::StreamExt;
 use eventsource_stream::Eventsource;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Manager, Emitter};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NotificationEvent {
@@ -42,7 +42,7 @@ impl SSEClient {
                                 if event.event == "notification" {
                                     if let Ok(notif) = serde_json::from_str::<NotificationEvent>(&event.data) {
                                         // Emit to frontend
-                                        self.app_handle.emit_all("new-notification", &notif).unwrap();
+                                        self.app_handle.emit("new-notification", &notif).unwrap();
 
                                         // Show notification popup
                                         if let Err(e) = self.show_notification_window(&notif).await {
@@ -73,13 +73,13 @@ impl SSEClient {
         let position = self.get_tray_position()?;
 
         // Create or get notification window
-        let window = match self.app_handle.get_window("notification") {
+        let window = match self.app_handle.get_webview_window("notification") {
             Some(w) => w,
             None => {
-                tauri::WindowBuilder::new(
+                tauri::WebviewWindowBuilder::new(
                     &self.app_handle,
                     "notification",
-                    tauri::WindowUrl::App("index.html".into())
+                    tauri::WebviewUrl::App("index.html".into())
                 )
                 .title("Notification")
                 .decorations(false)

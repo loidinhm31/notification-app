@@ -1,4 +1,4 @@
-use tauri::{Manager, State};
+use tauri::{Emitter, State};
 use crate::{AppState, NotificationEvent};
 
 #[tauri::command]
@@ -18,7 +18,7 @@ pub async fn show_notification(
     app_handle: tauri::AppHandle,
     event: NotificationEvent
 ) -> Result<(), String> {
-    app_handle.emit_all("new-notification", &event)
+    app_handle.emit("new-notification", &event)
         .map_err(|e| e.to_string())?;
     Ok(())
 }
@@ -29,10 +29,10 @@ pub async fn show_animation(
     animation_url: String
 ) -> Result<(), String> {
     // Create animation window
-    let window = tauri::WindowBuilder::new(
+    let window = tauri::WebviewWindowBuilder::new(
         &app_handle,
         "animation",
-        tauri::WindowUrl::App(animation_url.into())
+        tauri::WebviewUrl::App(animation_url.into())
     )
     .title("Animation")
     .fullscreen(false)
