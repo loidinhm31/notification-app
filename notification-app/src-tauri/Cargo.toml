@@ -20,3 +20,4 @@ anyhow = "1.0"
 parking_lot = "0.12"
 uuid = { version = "1.10", features = ["v4"] }
 chrono = "0.4"
+image = "0.25"

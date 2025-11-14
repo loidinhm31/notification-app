@@ -69,12 +69,23 @@ impl SSEClient {
     }
 
     async fn show_notification_window(&self, event: &NotificationEvent) -> anyhow::Result<()> {
+        // Notification window dimensions - sized for notification content
+        const WINDOW_WIDTH: f64 = 520.0;
+        const WINDOW_HEIGHT: f64 = 180.0;
+
         // Get tray position
-        let position = self.get_tray_position()?;
+        let position = self.get_tray_position(WINDOW_WIDTH, WINDOW_HEIGHT)?;
 
         // Create or get notification window
         let window = match self.app_handle.get_webview_window("notification") {
-            Some(w) => w,
+            Some(w) => {
+                // Update position for existing window
+                w.set_position(tauri::Position::Physical(tauri::PhysicalPosition {
+                    x: position.0 as i32,
+                    y: position.1 as i32,
+                }))?;
+                w
+            },
             None => {
                 tauri::WebviewWindowBuilder::new(
                     &self.app_handle,
@@ -87,7 +98,7 @@ impl SSEClient {
                 .always_on_top(true)
                 .skip_taskbar(true)
                 .resizable(false)
-                .inner_size(850.0, 450.0)
+                .inner_size(WINDOW_WIDTH, WINDOW_HEIGHT)
                 .position(position.0, position.1)
                 .build()?
             }
@@ -98,7 +109,7 @@ impl SSEClient {
         window.show()?;
         window.set_focus()?;
 
-        // Auto-hide after 5 seconds
+        // Auto-hide after 10 seconds
         let window_clone = window.clone();
         tauri::async_runtime::spawn(async move {
             tokio::time::sleep(tokio::time::Duration::from_secs(10)).await;
@@ -108,41 +119,39 @@ impl SSEClient {
         Ok(())
     }
 
-    fn get_tray_position(&self) -> anyhow::Result<(f64, f64)> {
-        // Calculate bottom-right position
-        // Notification window size
-        let window_width = 650.0;
-        let window_height = 250.0;
-        let margin = 10.0;
-        let taskbar_margin = 10.0;
+    fn get_tray_position(&self, window_width: f64, window_height: f64) -> anyhow::Result<(f64, f64)> {
+        // Margins from screen edges
+        let margin = 20.0;
+        let taskbar_margin = 40.0; // Extra margin for taskbar on Windows
 
-        // Try to get screen size from available monitors
-        // For now, use common screen resolutions with fallback
+        // Get the primary monitor's dimensions
+        let monitor = self.app_handle
+            .primary_monitor()
+            .map_err(|e| anyhow::anyhow!("Failed to get primary monitor: {}", e))?
+            .ok_or_else(|| anyhow::anyhow!("No primary monitor found"))?;
+
+        let screen_size = monitor.size();
+        let screen_width = screen_size.width as f64;
+        let screen_height = screen_size.height as f64;
+
+        // Calculate bottom-right position with appropriate margins
         #[cfg(target_os = "windows")]
         {
-            // Windows: bottom-right with taskbar at bottom
-            // Assuming 1920x1080 or similar
-            let screen_width = 1920.0;
-            let screen_height = 1080.0;
+            // Windows: account for taskbar at bottom
             let x = screen_width - window_width - margin;
             let y = screen_height - window_height - margin - taskbar_margin;
             Ok((x, y))
         }
         #[cfg(target_os = "macos")]
         {
-            // macOS: bottom-right (menu bar at top)
-            let screen_width = 1920.0;
-            let screen_height = 1080.0;
+            // macOS: menu bar is at top, dock can be at bottom/sides
             let x = screen_width - window_width - margin;
             let y = screen_height - window_height - margin - taskbar_margin;
             Ok((x, y))
         }
         #[cfg(target_os = "linux")]
         {
-            // Linux: bottom-right (panel/taskbar varies)
-            // Assuming 1920x1080 as most common resolution
-            let screen_width = 1920.0;
-            let screen_height = 1080.0;
+            // Linux: panel/taskbar position varies by DE
             let x = screen_width - window_width - margin;
             let y = screen_height - window_height - margin - taskbar_margin;
             Ok((x, y))

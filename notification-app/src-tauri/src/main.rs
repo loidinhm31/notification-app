@@ -49,7 +49,20 @@ fn main() {
                 &quit_i,
             ])?;
 
+            // Load the tray icon from embedded bytes
+            let icon_bytes = include_bytes!("../icons/icon.png");
+            let icon_image = image::load_from_memory(icon_bytes)
+                .map_err(|e| anyhow::anyhow!("Failed to load icon: {}", e))?;
+            let icon_rgba = icon_image.to_rgba8();
+            let (icon_width, icon_height) = icon_rgba.dimensions();
+            let icon = tauri::image::Image::new_owned(
+                icon_rgba.into_raw(),
+                icon_width,
+                icon_height
+            );
+
             let _tray = TrayIconBuilder::new()
+                .icon(icon)
                 .menu(&menu)
                 .on_menu_event(|app, event| match event.id.as_ref() {
                     "quit" => {

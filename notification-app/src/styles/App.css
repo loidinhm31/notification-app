@@ -20,16 +20,16 @@ body {
 }
 
 .notification-popup {
-  position: fixed;
-  bottom: 60px;
-  right: 20px;
-  width: 500px;
+  position: relative;
+  width: 100%;
+  height: 100%;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 16px;
   padding: 20px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   transition: transform 0.2s;
-  z-index: 10000;
+  display: flex;
+  flex-direction: column;
 }
 
 .notification-popup:hover {
@@ -41,6 +41,9 @@ body {
   position: relative;
   color: white;
   z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .notification-body {
